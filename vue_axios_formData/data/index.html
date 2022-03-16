@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/axios.min.js"></script>
+</head>
+<body>
+    
+    <div id="app">
+        <input type="text" v-model="inputtext">
+        <button @click="uploadfile">上传文件</button>
+        <h1>{{message}}</h1>
+        <div v-for ="(item, index) in imageLists" >
+            <img :src="item">
+        </div>
+    </div>
+</body>
+<script>
+    const app = new Vue({
+        el:"#app",
+        data: {
+            inputtext: '',
+            message: '你好啊',
+            imageLists: []
+        },
+        methods: {
+            getList(){ 
+                let that = this;
+                axios.post("/")
+                .then((response)=>{
+                    console.log(response.data);
+                    that.imageLists = [];
+                    var i;
+                    for (i in response.data) {
+                        that.imageLists.push( response.data[i] );
+                    }
+                })
+            },
+            uploadfile(){
+                var formdata = new FormData();
+                let blob = new Blob(['一个text文本'])
+                formdata.append('file',blob, this.inputtext + '.txt')
+                axios.post('/upload', formdata, {'Content-Type': 'multipart/form-data;'}).then((response)=>{
+                    console.log(response);
+                },(err)=>{
+                    console.log(err);
+                }) 
+            }
+        },
+        mounted(){
+            this.getList()
+        }
+    })
+</script>
+
+</html>

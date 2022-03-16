@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <form id="form1" method="POST" enctype="application/x-www-form-urlencoded">
+    <input type="file" id="file" onchange="showFormData(this)" >
+    <progress max="100" value="0">0% complete</progress>
+  </form>
+
+  <script>
+     function showFormData(file){
+       console.log(file.files[0])
+       var formData = new FormData(document.getElementById('form1'))
+       console.log(formData)
+     }
+     
+  </script>
+</body>
+</html>

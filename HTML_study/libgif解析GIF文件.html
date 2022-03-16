@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/libgif.js"></script>
+    <title>libgif解析GIF文件</title>
+</head>
+<body>
+    <input type="file" name="giffile"   id="file"   onchange="selectImage(this)" accept="image/gif">
+    <br>
+    <img src="" alt="" id="image">
+    <br>
+    <textarea name="" id="textarea" cols="49" rows="10"></textarea>
+    <br>
+    <input type="button"    onchange="location.reload()"    value="刷新页面">
+    <br>
+    <input type="button"  onclick="send2esp8266SPIFFS()" value="发送到esp8266SPIFFS">
+</body>
+<script>
+    var blob
+    function selectImage(file){
+        document.getElementById('textarea').innerText = ''
+        let image = ''
+        let binaryString
+        if (!file.files || !file.files[0]) {
+            return            
+        }
+        let reader = new FileReader();
+        reader.readAsBinaryString(file.files[0])
+        console.log(file.files[0])
+        reader.onload = function(evt){
+            binaryString = evt.target.result
+            let sup1 = new SuperGif({gif: document.getElementById('image'), progressbar_height: "3px"})
+            sup1.load_raw(binaryString,function(){
+                let myCanvas = sup1.get_canvas()
+                let ctx = myCanvas.getContext('2d')
+                let data = []
+                for(let i=0; i< sup1.get_length()-1; i++){
+                    sup1.move_to(i);
+                    data.push(...Array.from(ctx.getImageData(0,0,myCanvas.width,myCanvas.height).data))
+                }
+                let arrUint8 = new Uint8ClampedArray(data)
+                document.getElementById('textarea').innerText = arrUint8
+                blob = new Blob(arrUint8)
+                console.log(blob)
+            })
+        }
+    }
+
+    function send2esp8266SPIFFS(){
+        var xhr = new XMLHttpRequest()
+        xhr.open('POST','',true)
+        xhr.send(blob)
+    }
+</script>
+</html>

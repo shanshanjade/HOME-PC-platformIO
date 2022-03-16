@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color:#fff;
+        }
+        #canvas {
+            border-radius: 50%;
+            box-shadow: rgb(110, 110, 110) 0px 0px 20px 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="400px" height="400px"></canvas>
+</body>
+<script>
+    var hsb = {}; hsb.h = 0; hsb.s = 100; hsb.b = 100;
+    var rgb = {}; rgb.r = 0; rgb.g = 0; rgb.b = 0;
+    var pi = Math.PI;
+    HSBToRGB = function (hsb) {
+        var h = Math.round(hsb.h);
+        var s = Math.round(hsb.s * 255 / 100);
+        var v = Math.round(hsb.b * 255 / 100);
+        if (s == 0) {
+            rgb.r = rgb.g = rgb.b = v;
+        } else {
+            var t1 = v;
+            var t2 = (255 - s) * v / 255;
+            var t3 = (t1 - t2) * (h % 60) / 60;
+            if (h == 360) h = 0;
+            if (h < 60) { rgb.r = t1; rgb.b = t2; rgb.g = t2 + t3 }
+            else if (h < 120) { rgb.g = t1; rgb.b = t2; rgb.r = t1 - t3 }
+            else if (h < 180) { rgb.g = t1; rgb.r = t2; rgb.b = t2 + t3 }
+            else if (h < 240) { rgb.b = t1; rgb.r = t2; rgb.g = t1 - t3 }
+            else if (h < 300) { rgb.b = t1; rgb.g = t2; rgb.r = t2 + t3 }
+            else if (h < 360) { rgb.r = t1; rgb.g = t2; rgb.b = t1 - t3 }
+            else { rgb.r = 0; rgb.g = 0; rgb.b = 0 }
+        }
+    }
+    var canvas = document.querySelector('#canvas');
+    var ctx = canvas.getContext('2d');
+    ctx.strokeStyle = 'purple';
+    ctx.lineWidth = 3;
+    for (var i = 0; i < 720; i++) {
+        ctx.beginPath();
+        ctx.moveTo(200, 200);
+        hsb.h = Math.round(i/2);
+        HSBToRGB(hsb);
+        ctx.strokeStyle = 'rgb(' +  Math.round(rgb.r) + ',' + Math.round(rgb.g) + ',' + Math.round(rgb.b) + ')';
+        ctx.lineTo(200 + 200 * Math.cos(i * pi / 360), 200 + 200 * Math.sin(i * pi / 360))
+        ctx.lineTo(200, 200);
+        ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.arc(200,200,110,0,2*pi);
+    ctx.fill();
+
+    var linearGradient = ctx.createLinearGradient(165,165,235,235);
+    linearGradient.addColorStop(0,'white');
+    linearGradient.addColorStop(1,'red');
+    ctx.fillStyle = linearGradient;
+    ctx.beginPath();
+    ctx.arc(200,200,100,0,2*pi);
+    ctx.fill();
+    
+</script>
+
+</html>

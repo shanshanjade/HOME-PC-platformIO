@@ -1,0 +1,24 @@
+#include <Arduino.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <ESP8266WiFi.h>
+WiFiUDP Udp;
+void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin("xiaomi123","a.13513710972");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println(WiFi.localIP());
+  Udp.begin(8888);
+  MDNS.begin("esp8266");
+  MDNS.addService("udp","udp",8888);
+}
+
+void loop() {
+  MDNS.update();
+  // put your main code here, to run repeatedly:
+}
