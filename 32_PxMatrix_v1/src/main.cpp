@@ -54,9 +54,7 @@ File root;
 void clock_Date_Callback();
 void image_Play_Callback();
 void text_Scroll_Callback(String myString, uint8_t scroll_delay, uint16_t color, uint16_t bgcolor, bool is_rainbow_bg);
-
 void game_Snake_Callback();
-
 void draw_Week(uint8_t _week, uint8_t x, uint8_t y, uint16_t color, uint16_t weekend_color, uint16_t bg);
 void my_Printf(char* text, int x, int y, int _offsetX, int _offsetY, uint16_t color);
 String read_Text_SPIFFS(char* filePath, bool auto_next_line);
