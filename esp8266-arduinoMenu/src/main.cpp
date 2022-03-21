@@ -1,22 +1,9 @@
-// #include <SPI.h>
-// #include <SD.h>
 #include <FS.h>
 #include <menu.h>
 #include <menuIO/serialIO.h>
-// #include <plugin/SDMenu.h>
-#include <plugin/SPIFFSMenu.h>
-// #include <menuIO/esp8266Out.h>
+#include <SPIFFSMenu.h>
 using namespace Menu;
 
-//from: https://www.arduino.cc/en/Tutorial/listfiles
-// The circuit:
-// * SD card attached to SPI bus as follows:
-// ** MOSI - pin 11
-// ** MISO - pin 12
-// ** CLK - pin 13
-// ** CS - pin 4 (for MKRZero SD: SDCARD_SS_PIN)
-//this is for my due tft+sd shield
-#define SDCARD_SS 53
 
 //function to handle file select
 // declared here and implemented bellow because we need
@@ -27,7 +14,8 @@ result filePick(eventMask event, navNode& nav, prompt &item);
 
 // SDMenu filePickMenu("SD Card","/",filePick,enterEvent);
 //caching 32 file entries
-CachedSDMenu<32> filePickMenu("SD Card","/",filePick,enterEvent);
+// CachedSDMenu<32> filePickMenu("SPIFFS","/",filePick,enterEvent);
+SDMenu filePickMenu("SPIFFS","/",filePick,enterEvent);
 
 //implementing the handler here after filePick is defined...
 result filePick(eventMask event, navNode& nav, prompt &item) {
