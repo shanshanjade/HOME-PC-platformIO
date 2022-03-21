@@ -14,9 +14,8 @@ result filePick(eventMask event, navNode& nav, prompt &item);
 
 // SDMenu filePickMenu("SD Card","/",filePick,enterEvent);
 //caching 32 file entries
-// CachedSDMenu<32> filePickMenu("SPIFFS","/",filePick,enterEvent);
-SDMenu filePickMenu("SPIFFS","/",filePick,enterEvent);
-
+// SDMenu filePickMenu("SPIFFS","/",filePick,enterEvent);
+CachedSDMenu<32> filePickMenu("SPIFFS","/",filePick,enterEvent);
 //implementing the handler here after filePick is defined...
 result filePick(eventMask event, navNode& nav, prompt &item) {
   // switch(event) {//for now events are filtered only for enter, so we dont need this checking

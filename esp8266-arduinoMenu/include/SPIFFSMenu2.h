@@ -5,41 +5,46 @@
 // requires a dynamic menu (MENU_USERAM)
 // IO: Serial
 // Feb 2019 - Rui Azevedo [ruihfazevedo@gmail.com]
+
+//using SdFat library
+//from: https://github.com/greiman/SdFat
+
 #include <menu.h>
 
 using namespace Menu;
 
+#define FN_SIZE 255
+
 //minimalist SD Card driver (using arduino SD)
 //we avoid allocating memory here, instead we read all info from SD
-template<typename SDC>
+template<typename SDC,int fnSize=FN_SIZE>
 class FSO {
 public:
+  char fname[FN_SIZE+1];
   using Type=SDC;
   Type& sdc;
   //idx_t selIdx=0;//preserve selection context, because we preserve folder ctx too
   //we should use filename instead! idx is useful for delete operations thou...
 
-  Dir dir;
-  
+  File dir;
+
   FSO(Type& sdc):sdc(sdc) {}
-  virtual ~FSO() {/*dir.close();*/}
+  virtual ~FSO() {dir.close();}
+  //get file name
   //open a folder
   bool goFolder(String folderName) {
-    // dir.close();
-    Serial.println("reopen dir, context");
-    dir=sdc.openDir(folderName.c_str());
-    Serial.println(folderName.c_str());
-    // return dir.isDirectory();
-    return dir.isDirectory();
+    dir.close();
+    // Serial.println("reopen dir, context");
+    dir=sdc.open(folderName.c_str(), "r");
+    return dir;
   }
   //count entries on folder (files and dirs)
   long count() {
-    Serial.print("count:");
-    dir.rewind();
+    // Serial.print("count:");
+    dir.rewindDirectory();
     int cnt=0;
     while(true) {
-      dir.next();
-      File file=dir.openFile("r");
+      File file=dir.openNextFile();
       if (!file) {
         file.close();
         break;
@@ -47,17 +52,16 @@ public:
       file.close();
       cnt++;
     }
-    Serial.println(cnt);
+    // Serial.println(cnt);
     return cnt;
   }
 
   //get entry index by filename
   long entryIdx(String name) {
-    dir.rewind();
+    dir.rewindDirectory();
     int cnt=0;
     while(true) {
-      dir.next();
-      File file=dir.openFile("r");
+      File file=dir.openNextFile();
       if (!file) {
         file.close();
         break;
@@ -74,11 +78,10 @@ public:
 
   //get folder content entry by index
   String entry(long idx) {
-    dir.rewind();
+    dir.rewindDirectory();
     idx_t cnt=0;
     while(true) {
-      dir.next();
-      File file=dir.openFile("r");
+      File file=dir.openNextFile();
       if (!file) {
         file.close();
         break;
@@ -97,8 +100,8 @@ public:
 
 //////////////////////////////////////////////////////////////////////
 // SD Card cached menu
-template<typename SDC,idx_t maxSz>
-class CachedFSO:public FSO<SDC> {
+template<typename SDC,idx_t maxSz,int fnSize=FN_SIZE>
+class CachedFSO:public FSO<SDC,fnSize> {
 public:
   using Type=SDC;
   long cacheStart=0;
@@ -110,17 +113,17 @@ public:
     // Serial.print("Refreshing from:");
     // Serial.println(start);
     cacheStart=start;
-    FSO<SDC>::dir.rewind();
+    FSO<SDC>::dir.rewindDirectory();
     size=0;
     while(true) {
-      FSO<SDC>::dir.next();
-      File file=FSO<SDC>::dir.openFile("r");
+      File file=FSO<SDC>::dir.openNextFile();
       if (!file) {
         file.close();
         break;
       }
-      if (start<=size&&size<start+maxSz)
+      if (start<=size&&size<start+maxSz) {
         cache[size-start]=String(file.name())+(file.isDirectory()?"/":"");
+      }
       file.close();
       size++;
     }
@@ -252,7 +255,7 @@ public:
 
 class SDMenu:public SDMenuT<FSO<decltype(SPIFFS)>> {
 public:
-  SDMenu(constText* title,const char* at,Menu::action act=doNothing,Menu::eventMask mask=noEvent)
+  SDMenu(FS& sd,constText* title,const char* at,Menu::action act=doNothing,Menu::eventMask mask=noEvent)
     :SDMenuT<FSO<decltype(SPIFFS)>>(SPIFFS,title,at,act,mask) {}
 };
 
