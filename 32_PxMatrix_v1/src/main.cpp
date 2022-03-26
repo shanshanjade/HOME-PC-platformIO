@@ -10,7 +10,7 @@
 #include <GifPlayer.h>
 #include <NTPClient.h>
 #include <PxMatrix.h>
-#include <SPIFFS.h>
+// #include <SPIFFS.h>
 #include <Snake.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
