@@ -1,82 +1,40 @@
-// #include <SPI.h>
-// #include <SD.h>
 #include <FS.h>
 #include <menu.h>
 #include <menuIO/serialIO.h>
-// #include <plugin/SDMenu.h>
 #include <plugin/SPIFFSMenu.h>
-// #include <menuIO/esp8266Out.h>
 using namespace Menu;
 
-//from: https://www.arduino.cc/en/Tutorial/listfiles
-// The circuit:
-// * SD card attached to SPI bus as follows:
-// ** MOSI - pin 11
-// ** MISO - pin 12
-// ** CLK - pin 13
-// ** CS - pin 4 (for MKRZero SD: SDCARD_SS_PIN)
-//this is for my due tft+sd shield
-#define SDCARD_SS 53
-
-//function to handle file select
-// declared here and implemented bellow because we need
-// to give it as event handler for `filePickMenu`
-// and we also need to refer to `filePickMenu` inside the function
-result filePick(eventMask event, navNode& nav, prompt &item);
-
-
-// SDMenu filePickMenu("SD Card","/",filePick,enterEvent);
-//caching 32 file entries
-CachedSDMenu<32> filePickMenu("SD Card","/",filePick,enterEvent);
-
-//implementing the handler here after filePick is defined...
-result filePick(eventMask event, navNode& nav, prompt &item) {
-  // switch(event) {//for now events are filtered only for enter, so we dont need this checking
-  // case enterCmd:
-      if (nav.root->navFocus==(navTarget*)&filePickMenu) {
-        Serial.println();
-        Serial.print("selected file:");
-        Serial.println(filePickMenu.selectedFile);
-        Serial.print("from folder:");
-        Serial.println(filePickMenu.selectedFolder);
-      }
-  //     break;
-  // }
-  return proceed;
-}
+class altPrompt:public prompt {
+public:
+  // altPrompt(constMEM promptShadow& p):prompt(p) {}
+  using prompt::prompt;
+  Used printTo(navRoot &root,bool sel,menuOut& out, idx_t idx,idx_t len,idx_t) override {
+    return out.printRaw(F("special prompt!"),len);
+  }
+};
 
 #define MAX_DEPTH 2
+int test = 50;
+MENU(mainMenu, "Main menu", doNothing, noEvent, wrapStyle
+    ,FIELD(test,"TEST","%",0,100,10,1,doNothing,noEvent,wrapStyle)
 
-MENU(mainMenu,"Main menu",doNothing,noEvent,wrapStyle
-  ,SUBMENU(filePickMenu)
-  ,OP("Something else...",doNothing,noEvent)
-  ,EXIT("<Back")
-);
+    ,EXIT("退出")
 
+) ;
 MENU_OUTPUTS(out,MAX_DEPTH
   ,SERIAL_OUT(Serial)
   ,NONE//must have 2 items at least
 );
-
 serialIn serial(Serial);
 NAVROOT(nav,mainMenu,MAX_DEPTH,serial,out);
 
-void setup() {
-  Serial.begin(115200);
-  while (!Serial);
-  SPIFFS.begin();
-  delay(1000);
-  filePickMenu.begin();//need this after sd begin
-  Serial.println("initialization done.");
-  nav.useAccel=false;
+void setup(){
+    Serial.begin(112500);
+    while(!Serial);
+    Serial.println("PxMatrix Menu Set");
+    nav.useAccel=false;
 }
-
-constexpr int menuFPS=25;
-unsigned long nextPool=0;
-void loop() {
-  unsigned long now=millis();
-  if(now>=nextPool) {
+void loop(){
     nav.poll();
-    nextPool=now+1000/menuFPS;
-  }
+    delay(100);
 }
