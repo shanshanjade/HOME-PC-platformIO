@@ -1,7 +1,6 @@
 #include <FS.h>
 #include <menu.h>
 #include <menuIO/serialIO.h>
-<<<<<<< HEAD
 #include <plugin/SPIFFSMenu.h>
 using namespace Menu;
 
@@ -13,38 +12,7 @@ public:
     return out.printRaw(F("special prompt!"),len);
   }
 };
-=======
-#include <SPIFFSMenu.h>
-using namespace Menu;
 
-
-//function to handle file select
-// declared here and implemented bellow because we need
-// to give it as event handler for `filePickMenu`
-// and we also need to refer to `filePickMenu` inside the function
-result filePick(eventMask event, navNode& nav, prompt &item);
-
-
-// SDMenu filePickMenu("SD Card","/",filePick,enterEvent);
-//caching 32 file entries
-// SDMenu filePickMenu("SPIFFS","/",filePick,enterEvent);
-CachedSDMenu<32> filePickMenu("SPIFFS","/",filePick,enterEvent);
-//implementing the handler here after filePick is defined...
-result filePick(eventMask event, navNode& nav, prompt &item) {
-  // switch(event) {//for now events are filtered only for enter, so we dont need this checking
-  // case enterCmd:
-      if (nav.root->navFocus==(navTarget*)&filePickMenu) {
-        Serial.println();
-        Serial.print("selected file:");
-        Serial.println(filePickMenu.selectedFile);
-        Serial.print("from folder:");
-        Serial.println(filePickMenu.selectedFolder);
-      }
-  //     break;
-  // }
-  return proceed;
-}
->>>>>>> 1bffa0a9eb01776c7b5088e16176b05bef0fafda
 
 #define MAX_DEPTH 2
 int test = 50;
