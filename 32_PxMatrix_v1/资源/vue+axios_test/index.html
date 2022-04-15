@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>文件管理系统</title>
+</head>
+<body >
+    <h1>SPIFFS文件管理系统</h1>
+    <p id="demo"></p>
+    <a href="/upload.html">上传文件</a><br>
+    <a href="/delete.html">删除文件</a>
+    <a href="/format">格式化磁盘</a><br>
+    <a href="/reset">重启服务器</a>
+</body>
+
+<script>
+    function ajax(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var i;
+                var json;
+                var st = "";
+                json =  JSON.parse(this.responseText);
+                for (i in json.name){
+                    // st += "<a>" + json.name[i] + "<\a>" +"<br>" ;
+                    st += "<a href=\"" + json.name[i] + "\">" + json.name[i] + "</a><br>"
+                }
+                document.getElementById("demo").innerHTML = st;
+            }
+        };
+        xhttp.open("GET", "/list", true);
+        xhttp.send();
+    };
+</script>
+</html>
